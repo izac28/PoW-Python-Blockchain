@@ -31,7 +31,7 @@ class Block():
             #the nonce is incrimented to then generate a new hash that might be valid.
             self.nonce += 1
             self.hash = self.hash_block()
-        print(f"Hash found with nonce of: {self.nonce}")
+        print(f"\nHash found with nonce of: {self.nonce}")
 
     #dunder __str__ is used to print the contents of the block for the print_blockchain(self): method of the Blockchain class.
     def __str__(self):
