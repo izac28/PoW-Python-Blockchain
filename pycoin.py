@@ -4,15 +4,6 @@
 #import sha256, algorithm used to hash blocks
 from hashlib import sha256
 
-#hashing function that returns the sha256 hash of the block and its contents using utf-8 standard
-def hash(*args):
-    hashing_text = ""
-    h = sha256()
-    for arg in args:
-        hashing_text += str(arg)
-    h.update(hashing_text.encode('utf-8'))
-    return h.hexdigest()
-
 #block class, used to create instances of block objects.
 class Block():
 
@@ -23,7 +14,14 @@ class Block():
         self.data = data
         self.previous_hash = previous_hash
         self.nonce = 0
-        self.hash = "L" * 64
+        self.hash = "GenisisBlockHash" * 4
+
+    #hashing method that returns the sha256 hash of the block and its contents using utf-8 standard
+    def hash_block(self):
+        hashing_text =  str(self.nonce) + self.previous_hash + self.data
+        h = sha256()
+        h.update(hashing_text.encode('utf-8'))
+        return h.hexdigest()
 
     #the method used to find a valid hash for a block according to the difficulty which is 4 for this blockchain
     def mine(self, difficulty):
@@ -32,7 +30,7 @@ class Block():
         while self.hash[:difficulty] != '0' * difficulty:
             #the nonce is incrimented to then generate a new hash that might be valid.
             self.nonce += 1
-            self.hash = hash(self.previous_hash, self.data, self.nonce)
+            self.hash = self.hash_block()
         print(f"Hash found with nonce of: {self.nonce}")
 
     #dunder __str__ is used to print the contents of the block for the print_blockchain(self): method of the Blockchain class.
@@ -49,8 +47,8 @@ class Blockchain():
     defined as 4, so valid block hashes must start with 0000.
     '''
     def __init__(self):
-        self.chain = [Block("genesis block","000")]
-        self.difficulty = 4
+        self.chain = [Block("genesis block","NA")]
+        self.difficulty = 5
 
     #function used to add a block to the blockchain. blocks will be given their previous hash, mined for a valid hash
     #and appended to the end of the chain.
@@ -67,6 +65,17 @@ class Blockchain():
         print("\n")
         for block in self.chain:
             print(block)
+    
+    def create_block(self):
+        #prompt for the data that the block should have. (block content)
+        block_data = input("\nBlock data: ")
+        '''
+        Then create a new block with that data and append it to the blockchain. 
+        the empty string is there as the block does not yet know its previous hash,
+        later decided by self.chain[-1].hash in the add block method.
+        '''
+        custom_block = Block(block_data, "")
+        self.add_block(custom_block)
 
 #The main function that runs first when the script is instantised. requests an action of the user that will execute
 #different code depending on the action requested.
@@ -88,18 +97,7 @@ def main():
         #a switch is used to perform an action depending on the value of action variable
         match action:
             case 'add':
-
-                #prompt for the data that the block should have
-                block_data = input("\nBlock data: ")
-
-                '''
-                Then create a new block with that data and append it to the blockchain. 
-                the empty string is there as the block does not yet know its previous hash,
-                later decided by self.chain[-1].hash in the add block method.
-                '''
-                new_block = Block(block_data, "")
-                blockchain.add_block(new_block)
-            
+                blockchain.create_block()
             #case 2, use the print_blockchain method of the blockchain which will then access the __str__ method of the block
             case 'print':
                 blockchain.print_blockchain()
