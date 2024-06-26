@@ -10,27 +10,36 @@ class Block():
     #the block's constructor that defines some attributes that will be modified later during the mining process
     def __init__(self, data, previous_hash):
 
-        #these attributes will change later, exept for the genesis block, which will keep these attributes.
+        #The blocks data is set to the parameter of the data, which is the user input
         self.data = data
+        
+        #The blocks previous_hash attribute is set to the previous_hash parameter, which is the hash of the last block in the chain
         self.previous_hash = previous_hash
         self.nonce = 0
         self.hash = "GenisisBlockHash" * 4
 
     #hashing method that returns the sha256 hash of the block and its contents using utf-8 standard
     def hash_block(self):
+        
+        #attributes are concatenated together to be hashed
         hashing_text =  str(self.nonce) + self.previous_hash + self.data
         h = sha256()
         h.update(hashing_text.encode('utf-8'))
+
+        #returns the hash in hexadecimal format
         return h.hexdigest()
 
-    #the method used to find a valid hash for a block according to the difficulty which is 4 for this blockchain
+    #the method used to find a valid hash for a block according to the difficulty which is set to 5 in the blockchain. the difficulty can be changed.
     def mine(self, difficulty):
 
-        #this will loop until a hash is found that starts with the difficulty requirement.
+        #will loop until a hash is found that starts with the difficulty requirement.
         while self.hash[:difficulty] != '0' * difficulty:
+            
             #the nonce is incrimented to then generate a new hash that might be valid.
             self.nonce += 1
             self.hash = self.hash_block()
+
+        #once a valid hash is found, the script reports to the user the nonce that was used to find the hash.
         print(f"\nHash found with nonce of: {self.nonce}")
 
     #dunder __str__ is used to print the contents of the block for the print_blockchain(self): method of the Blockchain class.
@@ -56,11 +65,12 @@ class Blockchain():
 
         #self.chain[-1].hash returns the hash of the newest blockchain, the previous hash of the blockchain being added
         block.previous_hash = self.chain[-1].hash
+
+        #the block is then mined so that it is valid and is then added to the chain.
         block.mine(self.difficulty)
         self.chain.append(block)
 
-    #uses the blocks __str__ of the Block classmethod to print each attribute of each block, giving nice looking
-    #insight of the blockchains structure.
+    #uses the blocks __str__ method of the Block class to print each attribute of each block, giving nice looking insight of the blockchains structure and contents.
     def print_blockchain(self):
         print("\n")
         for block in self.chain:
@@ -77,7 +87,7 @@ class Blockchain():
         custom_block = Block(block_data, "")
         self.add_block(custom_block)
 
-#The main function that runs first when the script is instantised. requests an action of the user that will execute
+#The main function that runs first during an instance of the script. requests an action of the user that will execute
 #different code depending on the action requested.
 def main():
 
@@ -96,8 +106,11 @@ def main():
 
         #a switch is used to perform an action depending on the value of action variable
         match action:
+
+            #case 1, the create_block method of the blockchain object will be executed
             case 'add':
                 blockchain.create_block()
+                
             #case 2, use the print_blockchain method of the blockchain which will then access the __str__ method of the block
             case 'print':
                 blockchain.print_blockchain()
